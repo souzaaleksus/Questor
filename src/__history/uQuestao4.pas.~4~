@@ -1,0 +1,68 @@
+unit uQuestao4;
+
+interface
+
+type
+  TProduto = class
+    private
+      FIdProduto : Integer;
+      FDescricao : string;
+      FIdProdutoRegra : Integer;
+    public
+      property IdProduto : Integer
+        read FIdProduto
+        write FIdProduto;
+      property Descricao : string
+        read FDescricao
+        write FDescricao;
+      property IdProdutoRegra : Integer
+        read FIdProdutoRegra
+        write FIdProdutoRegra;
+  end;
+
+procedure GravarProdutos;
+
+implementation
+
+uses
+  System.SysUtils,
+  System.Generics.Collections,
+  Vcl.Dialogs;
+
+procedure GravarProduto( AProduto : TProduto );
+  begin
+  end;
+
+procedure GravarProdutos;
+  var
+    Lista : TObjectList< TProduto >;
+    Produto : TProduto;
+    i : Integer;
+  begin
+    Lista := TObjectList< TProduto >.Create( True );
+    try
+      for i := 1 to 10 do
+      begin
+        Produto := TProduto.Create;
+        Produto.IdProduto := i;
+        Produto.Descricao := 'Produto ' + IntToStr( i );
+        Produto.IdProdutoRegra := i;
+        Lista.Add( Produto );
+      end;
+
+      for Produto in Lista do
+      begin
+        try
+          GravarProduto( Produto );
+          ShowMessage( Format( 'Produto %d (%s) gravado com sucesso.', [ Produto.IdProduto, Produto.Descricao ] ) );
+        except
+          on E : Exception do
+            ShowMessage( Format( 'Produto %d (%s) não foi gravado: %s', [ Produto.IdProduto, Produto.Descricao, E.Message ] ) );
+        end;
+      end;
+    finally
+      Lista.Free;
+    end;
+  end;
+
+end.
