@@ -1,0 +1,29 @@
+/* 05: Clientes sorteados */
+
+SELECT 	TOP 15
+       	CL.ID_CLIENTE,
+       	CL.NOME,
+       	CL.CPF,
+       	MIN(V.DATA_VENDA) AS PRIMEIRA_COMPRA
+FROM 	CLIENTE CL
+	INNER JOIN VENDA V 
+		ON V.ID_CLIENTE = CL.ID_CLIENTE
+	INNER JOIN CARRO C 
+		ON C.ID_CARRO = V.ID_CARRO
+WHERE 	CL.CPF LIKE '0%'
+AND 	YEAR(C.DATA_LANCAMENTO) = 2021
+AND 	NOT EXISTS(	SELECT 	1
+                  	FROM 	VENDA V2
+                  		INNER JOI CARRO C2 
+					ON C2.ID_CARRO = V2.ID_CARRO
+                  	WHERE 	V2.ID_CLIENTE = CL.ID_CLIENTE
+                    	AND 	C2.MODELO = 'MAREA'
+                  	GROUP BY 
+				V2.ID_CLIENTE
+                  	HAVING COUNT(*) >= 2)
+GROUP BY 
+	CL.ID_CLIENTE, 
+	CL.NOME, 
+	CL.CPF
+ORDER BY 
+	MIN(V.DATA_VENDA);

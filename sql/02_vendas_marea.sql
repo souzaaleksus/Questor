@@ -1,0 +1,6 @@
+/* 02: Quantidade de vendas do carro Marea */
+
+SELECT 	COUNT(*) AS QTDE_VENDAS_MAREA
+FROM 	VENDA V
+JOIN 	CARRO C ON C.ID_CARRO = V.ID_CARRO
+WHERE 	C.MODELO = 'MAREA';

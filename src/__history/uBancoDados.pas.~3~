@@ -1,0 +1,24 @@
+unit uBancoDados;
+
+interface
+
+uses
+  Data.DB;
+
+procedure InserirDadosBD( const ASql : string );
+function ExecutarSql( const ASql : string ) : TDataSet;
+
+implementation
+
+procedure InserirDadosBD( const ASql : string );
+  begin
+    { implementacao ficticia - executaria o comando de INSERT no banco }
+  end;
+
+function ExecutarSql( const ASql : string ) : TDataSet;
+  begin
+    { implementacao ficticia - retornaria o resultado da consulta }
+    Result := nil;
+  end;
+
+end.

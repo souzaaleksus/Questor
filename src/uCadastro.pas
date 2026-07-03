@@ -1,0 +1,99 @@
+unit uCadastro;
+
+interface
+
+procedure InserirNovosClientes;
+procedure InserirNovosCarros;
+procedure InserirVendasNovosClientes;
+
+implementation
+
+uses
+  System.SysUtils,
+  System.DateUtils,
+  Data.DB,
+  uEntidades,
+  uBancoDados;
+
+procedure InserirNovosClientes;
+  const
+    NOMES : array [ 0 .. 4 ] of string = ( 'Ana Lima', 'Bruno Souza', 'Carla Dias', 'Daniel Rocha', 'Elisa Prado' );
+    CPFS : array [ 0 .. 4 ] of string = ( '01234567890', '02345678901', '03456789012', '04567890123', '05678901234' );
+  var
+    I : Integer;
+    Cliente : TCliente;
+  begin
+    for I := 0 to 4 do
+    begin
+      Cliente := TCliente.Create;
+      try
+        Cliente.IdCliente := I + 1;
+        Cliente.Nome := NOMES[ I ];
+        Cliente.Cpf := CPFS[ I ];
+
+        InserirDadosBD( Format( 'INSERT INTO CLIENTE (ID_CLIENTE, NOME, CPF) VALUES (%d, %s, %s)', [ Cliente.IdCliente, QuotedStr( Cliente.Nome ),
+          QuotedStr( Cliente.Cpf ) ] ) );
+      finally
+        Cliente.Free;
+      end;
+    end;
+  end;
+
+procedure InserirNovosCarros;
+  const
+    MODELOS : array [ 0 .. 4 ] of string = ( 'PALIO', 'TORO', 'ARGO', 'MOBI', 'PULSE' );
+  var
+    I : Integer;
+    Carro : TCarro;
+  begin
+    for I := 0 to 4 do
+    begin
+      Carro := TCarro.Create;
+      try
+        Carro.IdCarro := I + 1;
+        Carro.Modelo := MODELOS[ I ];
+        Carro.DataLancamento := EncodeDate( 2021, I + 1, 1 );
+
+        InserirDadosBD( Format( 'INSERT INTO CARRO (ID_CARRO, MODELO, DATA_LANCAMENTO) VALUES (%d, %s, %s)', [ Carro.IdCarro, QuotedStr( Carro.Modelo ),
+          QuotedStr( FormatDateTime( 'yyyy-mm-dd', Carro.DataLancamento ) ) ] ) );
+      finally
+        Carro.Free;
+      end;
+    end;
+  end;
+
+procedure InserirVendasNovosClientes;
+  var
+    DsClientes, DsCarros : TDataSet;
+    Venda : TVenda;
+    IdVenda : Integer;
+  begin
+    DsClientes := ExecutarSql( 'SELECT TOP 5 ID_CLIENTE FROM CLIENTE ORDER BY ID_CLIENTE DESC' );
+    DsCarros := ExecutarSql( 'SELECT TOP 5 ID_CARRO FROM CARRO ORDER BY ID_CARRO DESC' );
+
+    IdVenda := 1;
+    DsClientes.First;
+    DsCarros.First;
+
+    while ( not DsClientes.Eof ) and ( not DsCarros.Eof ) do
+    begin
+      Venda := TVenda.Create;
+      try
+        Venda.IdVenda := IdVenda;
+        Venda.IdCliente := DsClientes.FieldByName( 'ID_CLIENTE' ).AsInteger;
+        Venda.IdCarro := DsCarros.FieldByName( 'ID_CARRO' ).AsInteger;
+        Venda.DataVenda := Date;
+
+        InserirDadosBD( Format( 'INSERT INTO VENDA (ID_VENDA, ID_CLIENTE, ID_CARRO, DATA_VENDA) ' + 'VALUES (%d, %d, %d, %s)',
+          [ Venda.IdVenda, Venda.IdCliente, Venda.IdCarro, QuotedStr( FormatDateTime( 'yyyy-mm-dd', Venda.DataVenda ) ) ] ) );
+      finally
+        Venda.Free;
+      end;
+
+      Inc( IdVenda );
+      DsClientes.Next;
+      DsCarros.Next;
+    end;
+  end;
+
+end.
